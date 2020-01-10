@@ -48,6 +48,7 @@ class AddCreatureViewModel(
             when(result) {
                 is AvatarResult -> reduceAvatar(previousState, result)
                 is NameResult -> reduceName(previousState, result)
+                is IntelligenceResult -> reduceIntelligence(previousState, result)
                 is StrengthResult -> reduceStrength(previousState, result)
                 is EnduranceResult -> reduceEndurance(previousState, result)
                 is SaveResult -> reduceSave(previousState, result)
