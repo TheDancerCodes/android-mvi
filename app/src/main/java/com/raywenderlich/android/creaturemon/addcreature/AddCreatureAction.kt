@@ -3,6 +3,8 @@ package com.raywenderlich.android.creaturemon.addcreature
 /**
  *  Kotlin sealed class with data classes to represent the actions.
  *
+ * The actions correspond to all the AddCreatureIntent intents.
+ *
  *  The actions take the same parameters as the intents.
  */
 sealed class AddCreatureAction {
