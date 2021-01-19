@@ -1,28 +1,95 @@
 package com.raywenderlich.android.creaturemon.addcreature
 
 import androidx.lifecycle.ViewModel
+import com.raywenderlich.android.creaturemon.addcreature.AddCreatureAction.*
+import com.raywenderlich.android.creaturemon.addcreature.AddCreatureIntent.*
 import com.raywenderlich.android.creaturemon.addcreature.AddCreatureResult.*
 import com.raywenderlich.android.creaturemon.data.model.CreatureAttributes
 import com.raywenderlich.android.creaturemon.data.model.CreatureGenerator
 import com.raywenderlich.android.creaturemon.mvibase.MviViewModel
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
+import io.reactivex.subjects.PublishSubject
 
 /**
  * actionProcessorHolder - Processor Holder property that extends the ViewModel class & implements
  * the MviViewModel interface.
  *
  * The MviViewModel is typed with an Intent & ViewState.
+ *
+ * NOTE: We don't have to worry about an initial loading state for this screen,
+ * so we don't need an intentFilter
  */
 class AddCreatureViewModel(
         private val actionProcessorHolder: AddCreatureProcessorHolder
 ) : ViewModel(), MviViewModel<AddCreatureIntent, AddCreatureViewState> {
+
+    /*
+     * Rx properties that we will use to process intents from the view & create state events that
+     * will be observed by the view.
+     *
+     * intentsSubject - PublishSubject that will start our Observable stream in the ViewModel.
+     * statesObservable - This value is set up using a private method compose()
+     */
+    private val intentsSubject: PublishSubject<AddCreatureIntent> = PublishSubject.create()
+    private val stateObservable: Observable<AddCreatureViewState> = compose()
+
+    // Subscribe to intents passed in from the view using our intentsSubject as the subscriber
     override fun processIntents(intents: Observable<AddCreatureIntent>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        intents.subscribe(intentsSubject)
     }
 
-    override fun states(): Observable<AddCreatureViewState> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    // Return our private statesObservable property
+    override fun states(): Observable<AddCreatureViewState> = stateObservable
+
+    /*
+     * compose() - produces our statesObservable property
+     *
+     * We then map() the intent to an action
+     *
+     * compose() with our actionProcessor in order to process to results that are then fed into
+     * the scan() operator to reduce to a new state.
+     *
+     * scan() operator - applies the reducer and uses the state provided by the idle function as a
+     * default state, which it feeds back into the stream along with the second item emitted in the
+     * stream to which the reducer is applied & then that is fed back into the stream and so on.
+     *
+     * NOTE: Compare this use of the scan() operator to the use of the reduce method on a Kotlin
+     * collection, and you can see why we use the term reducer.
+     *
+     * distinctUntilChanged() - to ensure contiguous duplicate states do not come through,
+     * to prevent unnecessary rendering of duplicate states.
+     *
+     * replay(1) - to ensure a new subscriber will get the last emitted Observable right away.
+     *
+     * autoConnect(0) - to make sure that the connection is immediate.
+     */
+    private fun compose(): Observable<AddCreatureViewState> {
+        return intentsSubject
+                .map(this::actionFromIntent)
+                .compose(actionProcessorHolder.actionProcessor)
+                .scan(AddCreatureViewState.default(), reducer)
+                .distinctUntilChanged()
+                .replay(1)
+                .autoConnect(0)
+    }
+
+    // To map/convert Intents into Actions
+    private fun actionFromIntent(intent: AddCreatureIntent): AddCreatureAction {
+        return when(intent) {
+            is AvatarIntent -> AvatarAction(intent.drawable)
+            is NameIntent -> NameAction(intent.name)
+            is IntelligenceIntent -> IntelligenceAction(intent.intelligenceIndex)
+            is StrengthIntent -> StrengthAction(intent.strengthIndex)
+            is EnduranceIntent -> EnduranceAction(intent.enduranceIndex)
+            is  SaveIntent -> SaveAction(
+                    intent.drawable,
+                    intent.name,
+                    intent.intelligenceIndex,
+                    intent.strengthIndex,
+                    intent.enduranceIndex
+            )
+        }
     }
 
     /*
