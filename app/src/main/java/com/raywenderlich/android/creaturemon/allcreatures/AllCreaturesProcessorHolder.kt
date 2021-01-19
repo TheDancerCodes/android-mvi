@@ -17,7 +17,7 @@ import java.lang.IllegalArgumentException
  * Create both a loadAllCreaturesProcessor & clearAllCreaturesProcessor.
  *
  * NOTE: An RxJava Observable transformer takes an observable of one type & returns an observable
- * of another type.
+ * of another type. We will use our Observable transformer to transform our Actions into Results.
  */
 class AllCreaturesProcessorHolder(
         private val creatureRepository: CreatureRepository,

@@ -3,6 +3,8 @@ package com.raywenderlich.android.creaturemon.addcreature
 import com.raywenderlich.android.creaturemon.mvibase.MviIntent
 
 /**
+ * AddCreatureIntent implements MviIntent to have all the intents be MVI intents
+ *
  * Data intent subtypes to capture all the options.
  */
 sealed class AddCreatureIntent : MviIntent {
@@ -21,7 +23,7 @@ sealed class AddCreatureIntent : MviIntent {
     data class EnduranceIntent(val enduranceIndex: Int) : AddCreatureIntent()
 
     // Intent for when user taps save button.
-    // This intent will need all of the items on the screen to save a new creature.
+    // This intent will need all of the data items on the screen to save a new creature.
     data class SaveIntent(
        val drawable: Int,
        val name: String,
