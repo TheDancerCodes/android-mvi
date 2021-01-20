@@ -14,4 +14,5 @@
   <string name="clear_all_creatures">Clear All Creatures</string>
   <string name="add_creature">Add Creature</string>
     <string name="no_creatures_found">No creatures found.</string>
+  <string name="error_loading_creatures">Error Loading creatures.</string>
 </resources>
