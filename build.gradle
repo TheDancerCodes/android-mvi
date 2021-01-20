@@ -10,6 +10,8 @@ buildscript {
     rxAndroidVersion = '2.1.0'
     rxBindingVersion = '2.0.0'
     lifecycle_version = '2.0.0'
+    mockitoVersion = '2.7.22'
+    mockitoKotlinVersion = '1.5.0'
   }
   repositories {
     google()
